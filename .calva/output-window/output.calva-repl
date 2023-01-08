@@ -1,0 +1,289 @@
+; This is the Calva evaluation results output window.
+; TIPS: The keyboard shortcut `ctrl+alt+o o` shows and focuses this window
+;   when connected to a REPL session.
+; Please see https://calva.io/output/ for more info.
+; Happy coding! ♥️
+
+; Jacking in...
+; Starting Jack-in Terminal: cmd.exe /d /c lein update-in :dependencies conj [nrepl,"1.0.0"] -- update-in :plugins conj [cider/cider-nrepl,"0.28.5"] -- update-in [:repl-options,:nrepl-middleware] conj '["cider.nrepl/cider-middleware"]' -- repl :headless
+; Hooking up nREPL sessions...
+; Connected session: clj
+; TIPS:
+;   - You can edit the contents here. Use it as a REPL if you like.
+;   - `alt+enter` evaluates the current top level form.
+;   - `ctrl+enter` evaluates the current form.
+;   - `alt+up` and `alt+down` traverse up and down the REPL command history
+;      when the cursor is after the last contents at the prompt
+;   - Clojure lines in stack traces are peekable and clickable.
+clj꞉restaroni.core꞉>  ; Use `alt+enter` to evaluate
+; Jack-in done.
+clj꞉restaroni.core꞉> 
+; Syntax error compiling at (c:\Users\theca\repos\restaroni\src\tti\core.clj:39:3).
+; No such namespace: fx
+clj꞉e01-basic꞉> 
+nil
+clj꞉e01-basic꞉> 
+#'e01-basic/save-stage-as-png
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@2e939677: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@d1889d5: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@1a68056: :not-delivered>
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@74d7b14e: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@52341dc1: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@7249cff1: :not-delivered>
+clj꞉e01-basic꞉> 
+; Syntax error compiling at (c:\Users\theca\repos\restaroni\src\tti\core.clj:56:37).
+; Unable to resolve symbol: stage in this context
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@32966497: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@3f46b9a5: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@31f9a227: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@4342437d: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@3b9cbb19: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@7608197: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@110363ad: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@7b56bb46: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@204947ac: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@517c1eb1: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@35da95e1: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@79d24b8: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@da9857a: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@66033288: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@49532b75: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@74f87bfe: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@2c3d142f: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@6858586e: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@7a5be5c9: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@708f0997: :not-delivered>
+clj꞉e01-basic꞉> 
+; Syntax error (IllegalArgumentException) compiling new at (c:\Users\theca\repos\restaroni\src\tti\core.clj:56:92).
+; Unable to resolve classname: WritableImage
+clj꞉e01-basic꞉> 
+; Execution error (ClassNotFoundException) at java.net.URLClassLoader/findClass (URLClassLoader.java:476).
+; javafx.scene.WritableImage
+clj꞉e01-basic꞉> 
+nil
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@23d1f0f6: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/save-stage-as-png
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@61f73c6: :not-delivered>
+clj꞉e01-basic꞉> 
+; Syntax error (ClassNotFoundException) compiling at (c:\Users\theca\repos\restaroni\src\tti\core.clj:37:20).
+; BufferedImage.
+clj꞉e01-basic꞉> 
+#'e01-basic/save-stage-as-png
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@387977ca: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@596e29e4: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/save-stage-as-png
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@c8763: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@6e2c8586: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/save-stage-as-png
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@6e365254: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/save-stage-as-png
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@7ae9d27e: :not-delivered>
+clj꞉e01-basic꞉> 
+; Syntax error (IllegalArgumentException) compiling new at (c:\Users\theca\repos\restaroni\src\tti\core.clj:37:34).
+; No matching ctor found for class java.awt.image.BufferedImage
+clj꞉e01-basic꞉> 
+; Syntax error (ClassNotFoundException) compiling at (c:\Users\theca\repos\restaroni\src\tti\core.clj:37:3).
+; BufferedImage.
+clj꞉e01-basic꞉> 
+#'e01-basic/save-stage-as-png
+clj꞉e01-basic꞉> 
+#'e01-basic/save-stage-as-png
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@7fd08850: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/save-stage-as-png
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@81f5602: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@287d5ec7: :not-delivered>
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+; Execution error (IllegalStateException) at com.sun.javafx.tk.Toolkit/checkFxUserThread (Toolkit.java:291).
+; Not on FX application thread; currentThread = nREPL-session-d59a6a09-173e-4322-a19a-909b75fb05a1
+clj꞉e01-basic꞉> 
+#'e01-basic/-main
+clj꞉e01-basic꞉> 
+(-main)
+#<Delay@288595cd: :not-delivered>
+clj꞉e01-basic꞉> 
+nil
+clj꞉tti.core꞉> 
+#'tti.core/save-stage-as-png
+clj꞉tti.core꞉> 
+#'tti.core/-main
+clj꞉tti.core꞉> 
+(-main)
+#<Delay@35e48395: :not-delivered>
+clj꞉tti.core꞉> 
+#'tti.core/-main
+clj꞉tti.core꞉> 
+(-main)
+#<Delay@4463ecc3: :not-delivered>
+clj꞉tti.core꞉> 
+(-main)
+#<Delay@58:not-delivered> ac2ca6:
+clj꞉tti.core꞉> 
+#'tti.core/-main
+clj꞉tti.core꞉> 
+(-main)
+#<Delay@3b8d5ad4: :not-delivered>
+clj꞉tti.core꞉> 
+#'tti.core/-main
+clj꞉tti.core꞉> 
+(-main)
+#<Delay@2addc7c1: :not-delivered>
+clj꞉tti.core꞉> 
+(-main)
+#<Delay@1d02d62f: :not-delivered>
+clj꞉tti.core꞉> 
+(-main)
+#<Delay@5b78d3ab: :not-delivered>
+clj꞉tti.core꞉> 
+(-main)
+#<Delay@7ef1c91c: :not-delivered>
+clj꞉tti.core꞉> 
