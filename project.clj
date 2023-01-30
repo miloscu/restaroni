@@ -19,6 +19,17 @@
                  [org.openjfx/javafx-controls "14" :classifier "win"]
                  [org.openjfx/javafx-fxml "14" :classifier "win"]
                  [org.openjfx/javafx-swing "14" :classifier "win"]
-                 [cljfx "1.7.22"]]
+                 [cljfx "1.7.22"]
+                 [clj-commons/fs "1.6.310"]
+                 [manifold "0.3.0"]
+                 [net.sf.sociaal/freetts "1.2.2"]
+                 [org.clojure/core.async "1.6.673"]
+                 [org.bytedeco/ffmpeg "5.1.2-1.5.8"]
+                 [org.bytedeco/ffmpeg-platform "5.1.2-1.5.8"]
+                 [org.bytedeco/javacv "1.5.8"]
+                 [org.bytedeco/javacv "1.5.8"]
+                 [org.bytedeco/javacpp "1.5.8"]
+                 [com.googlecode.mp4parser/isoparser "1.1.22"]]
   :repl-options {:init-ns restaroni.core}
+  :jvm-opts ["-Xmx6G"]
   :main ^:skip-aot restaroni.core)

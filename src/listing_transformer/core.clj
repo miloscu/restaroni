@@ -10,7 +10,7 @@
   [client subreddit link]
   (let [comments (creddit/listing-comments client subreddit link)]
     (hash-map :more-children (:children (:data (last (:children (:data (second comments))))))
-              :comments (map #(select-keys (:data %) [:body, :ups]) (filter #(not= "[deleted]" %) (:children (:data (second comments))))))))
+              :comments (map #(select-keys (:data %) [:body, :ups, :name]) (filter #(not= "[deleted]" %) (:children (:data (second comments))))))))
 
 (defn get-listing-title-ups-awards-awardcount
   [client link]

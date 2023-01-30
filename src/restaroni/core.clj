@@ -2,22 +2,17 @@
   (:require [clojure.java.io :as io]
             [compojure.core :refer [GET POST routes]]
             [compojure.route :as route]
-            [hiccup.form :refer [form-to text-field]]
-            [hiccup.page :refer [html5]]
             [ring.adapter.jetty :as jetty]
             [ring.middleware.content-type :as content-type]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
-            [ring.util.anti-forgery :refer [anti-forgery-field]]
             [creddit.core :as creddit]
+            [controller.core :as controller]
             [listing-transformer.core :as listing-transformer]))
 
-(defn csrf-token []
-  (anti-forgery-field))
+;; (def creds {:user-client "3Nb6bpRn7uTjgA",
+;;             :user-secret "48uwu2IIZp5t6CPxl3SzT1_6hEubww"})
 
-(def creds {:user-client "3Nb6bpRn7uTjgA",
-            :user-secret "48uwu2IIZp5t6CPxl3SzT1_6hEubww"})
-
-(def creddit-client (creddit/init creds))
+;; (def creddit-client (creddit/init creds))
 
 ;; (def my-listing
 ;;   (listing-transformer/get-listing-title-ups-awards-awardcount creddit-client ["t3_zsl0mj"]))
@@ -75,28 +70,10 @@
 (def app-routes
   (routes
    (GET "/favicon.ico" [] (slurp (io/resource "favicon.ico")))
-   (GET "/hello" []
-     (html5
-      [:head [:title "Hello, World!"]]
-      [:body
-       [:h1 "Hello, World!"]
-       (form-to [:post "/submit"]
-                (csrf-token)
-                [:label "Name" (text-field {:name "name"} "Enter your name")]
-                [:br]
-                [:label "Email" (text-field {:name "email"} "Enter your email")]
-                [:br]
-                [:input {:type "submit" :value "Submit"}])]))
+   (GET "/" [] 
+     (controller/home-page))
    (POST "/submit" request
-     (let [params (:params request)
-           name (:name params)
-           email (:email params)]
-      ;;  print the params
-       (println "params: " params)
-       (println "name: " name)
-       (println "email: " email)
-     ))
-      ;;  (final-map-html5)))
+     (controller/submit-page request))
    (route/resources "/")
    (route/not-found "Not Found")))
 
