@@ -74,6 +74,14 @@
      (controller/home-page))
    (POST "/submit" request
      (controller/submit-page request))
+   (GET "/resources/:resource" req
+     (controller/resources-page req))
+   (GET "/movies/:resource" req
+     (controller/movies-page req))
+   (GET "/nonsilent/:resource" req
+     (controller/nonsilent-page req))
+   (GET "/concatenated/:resource" req
+     (controller/concatenated-page req))
    (route/resources "/")
    (route/not-found "Not Found")))
 

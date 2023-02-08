@@ -19,10 +19,14 @@
 ;; (tts-to-file "Hello, world!" "hello.wav")
 
 (defn speakaroni [path text _i voice]
-  (let [audioPlayer (new SingleFileAudioPlayer path AudioFileFormat$Type/AU)]
+  (let [wavAudioPlayer (new SingleFileAudioPlayer path AudioFileFormat$Type/WAVE)
+        auAudioPlayer (new SingleFileAudioPlayer path AudioFileFormat$Type/AU)]
     (try
       ;; (Thread/sleep (* wait 100))
-      (.setAudioPlayer voice audioPlayer)
+      (.setAudioPlayer voice wavAudioPlayer)
       (.speak voice text)
-      (.close audioPlayer)
+      (.close wavAudioPlayer)
+      (.setAudioPlayer voice auAudioPlayer)
+      (.speak voice text)
+      (.close auAudioPlayer)
       (catch Exception e (println "err")))))

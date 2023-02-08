@@ -2,12 +2,14 @@
   (:import [com.googlecode.mp4parser.authoring Movie]
            [com.googlecode.mp4parser.authoring Track]
            [com.googlecode.mp4parser.authoring.builder DefaultMp4Builder]
+           [com.googlecode.mp4parser.authoring.builder FragmentedMp4Builder]
            [com.googlecode.mp4parser.authoring.container.mp4 MovieCreator]
            [com.googlecode.mp4parser.authoring.tracks AppendTrack]
            [java.io File]
            [java.io FileInputStream]
            [java.io BufferedInputStream]
            [java.io FileOutputStream]
+           [java.io RandomAccessFile]
            [javax.imageio ImageIO]
            [javax.sound.sampled AudioSystem]
            [org.bytedeco.ffmpeg.global avcodec]
@@ -17,76 +19,29 @@
            [org.bytedeco.javacv Java2DFrameConverter]
            [javax.sound.sampled AudioFormat]
            [javax.sound.sampled AudioFormat$Encoding]
-           [javax.sound.sampled AudioInputStream]))
+           [javax.sound.sampled AudioInputStream])
+  (:require [clojure.string :as str]))
 
-(defn conc []
-  (let [movie1 (MovieCreator/build "./file.mp4")
-        movie2 (MovieCreator/build "./file.mp4")
-        movie3 (MovieCreator/build "./file.mp4")
-        vet-track-video (into-array Track (filter #(= (:handler %) "vide")
-                                                  (flatten (map :tracks [movie1 movie2 movie3]))))
-        vet-track-audio (into-array Track (filter #(= (:handler %) "soun")
-                                                  (flatten (map :tracks [movie1 movie2 movie3]))))
-        movie-output (new Movie)
-        list-tracks (list (new AppendTrack vet-track-video) (new AppendTrack vet-track-audio))]
-    (.setTracks movie-output list-tracks)
-    (let [mp4-builder (new DefaultMp4Builder)
-          c (.build mp4-builder movie-output)
-          fos (new FileOutputStream "output.mp4")]
-      (.writeContainer c (.getChannel fos))
-      (.close fos))))
-
-(defn xonc []
-  (let [movie1 (MovieCreator/build "./file.mp4")
-        movie2 (MovieCreator/build "./file.mp4")
-        movie3 (MovieCreator/build "./file.mp4")
+;; Function to merge multiple videos into one video
+(defn conc [video-paths filename]
+  (let [movies (vec (map #(MovieCreator/build %) video-paths))
         vet-track-video (into-array Track (filter #(= (.getHandler %) "vide")
-                                                  (apply concat (flatten (map #(.getTracks %) [movie1 movie2 movie3])))))
-        vet-track-audio (into-array Track (filter #(= (.getHandler %) "soun")
-                                                  (apply concat (flatten (map #(.getTracks %) [movie1 movie2 movie3])))))
+                                                  (apply concat (flatten (map #(.getTracks %) movies)))))
         movie-output (new Movie)
-        ;; list-tracks (list (new AppendTrack vet-track-video) (new AppendTrack vet-track-audio))
-        ;; list-tracks (list (AppendTrack. (vec vet-track-video)) (AppendTrack. (vec vet-track-audio)))
-        ;; list-tracks (list (AppendTrack. (into-array Track vet-track-video)) (AppendTrack. (into-array Track vet-track-audio)))
 
         vtvat (new AppendTrack vet-track-video)
-        vtaat (new AppendTrack vet-track-audio)
-        list-tracks (list vtvat vtaat)]
+        list-tracks (list vtvat)]
+
+    (println "video-paths: " video-paths)
+    (println "vet-track-video: " (first vet-track-video))
+
     (.setTracks movie-output list-tracks)
-    ;; (println (map #(.toString %) vet-track-audio))
-    ;; (map #(.getHandler %) (apply concat (flatten (map #(.getTracks %) [movie1 movie2 movie3]))))
-    ;; (apply concat (flatten (map #(.getTracks %) [movie1 movie2 movie3])))
-    ;; list-tracks
-    (let [mp4-builder (new DefaultMp4Builder)
+    (let [mp4-builder (new FragmentedMp4Builder)
           c (.build mp4-builder movie-output)
-          fos (new FileOutputStream "output.mp4")]
-      (.writeContainer c (.getChannel fos))
-      (.close fos))))
+          fc (.getChannel (new RandomAccessFile filename "rw"))]
+      (.writeContainer c fc)
+      (.close fc))))
 
-(defn create [path img-path wav-path width height]
-  (let [recorder (FFmpegFrameRecorder. path width height)
-        converter (Java2DFrameConverter.)
-        img (new File img-path)
-        audio-stream (AudioSystem/getAudioInputStream (new File wav-path))]
-
-    (try
-      (.setVideoCodec recorder avcodec/AV_CODEC_ID_H264)
-      (.setFrameRate recorder 25)
-      (.setPixelFormat recorder avutil/AV_PIX_FMT_YUV420P)
-      (.setFormat recorder "mp4")
-
-      (.start recorder)
-      ;; (doseq [i (range duration)]
-      (doseq [i (range 10)]
-        (let [image (ImageIO/read img)
-              frame (.convert converter image)]
-          (println "Recording frame " i)
-          (.record recorder frame)))
-
-      (catch Exception e
-        (println "Error setting video codec: " e))
-      (finally (.stop recorder)
-               (.release recorder)))))
 
 ;; Function to finf all files of a specific file type in a folder
 (defn find-files [folder file-type]
@@ -100,16 +55,12 @@
         img (new File img-path)
         audio-input-stream (AudioSystem/getAudioFileFormat (new File wav-path))
         duration-ms (int (/ (* 1000 (.getFrameLength audio-input-stream))
-                            (.getFrameRate (.getFormat audio-input-stream))))
-        ;; duration 20
-        ]
-
-    ;; duration-ms
+                            (.getFrameRate (.getFormat audio-input-stream))))]
 
     (try
       (.setVideoCodec recorder avcodec/AV_CODEC_ID_H264)
       (.setFrameRate recorder 25)
-      (.setVideoBitrate recorder 100)
+      (.setVideoBitrate recorder 200)
       (.setPixelFormat recorder avutil/AV_PIX_FMT_YUV420P)
       (.setFormat recorder "mp4")
 
@@ -121,7 +72,39 @@
           (.record recorder frame)))
 
       (catch Exception e
-        (println "Error setting video codec: " e))
+        (println path img-path wav-path))
+      (finally (.stop recorder)
+               (.release recorder)))))
+
+(defn xreate-all [path img-paths wav-paths width height]
+  (let [recorder (FFmpegFrameRecorder. path width height)
+        converter (Java2DFrameConverter.)
+        imgs (map #(new File %) img-paths)
+        audio-input-streams (map #(AudioSystem/getAudioFileFormat (new File %)) wav-paths)
+        duration-ms-arr (map #(int (/ (* 1000 (.getFrameLength %))
+                                      (.getFrameRate (.getFormat %)))) audio-input-streams)]
+
+    (println "duration-ms-arr: " duration-ms-arr)
+
+    (try
+      (.setVideoCodec recorder avcodec/AV_CODEC_ID_H264)
+      (.setFrameRate recorder 25)
+      (.setVideoBitrate recorder 200)
+      (.setPixelFormat recorder avutil/AV_PIX_FMT_YUV420P)
+      (.setFormat recorder "mp4")
+
+      (.start recorder)
+      (doseq [j (range (count imgs))]
+        (let [img (nth imgs j)
+              duration-ms (nth duration-ms-arr j)]
+          (doseq [i (range (/ (float duration-ms) 40))]
+            (let [image (ImageIO/read img)
+                  frame (.convert converter image)]
+              (println "Recording frame " i)
+              (.record recorder frame)))))
+
+      (catch Exception e
+        (println path img-paths wav-paths))
       (finally (.stop recorder)
                (.release recorder)))))
 
@@ -134,9 +117,20 @@
        (str folder "/" % ".mp4")
        (str folder "/" % ".png")
        (str folder "/" % ".au")
-       1280
-       720)
+       1920
+       1080)
      files-list)))
+
+(defn folder-to-movies2 [folder]
+  (let [files (File. folder)
+        files-list (.list files)
+        files-list (sort (map #(subs % 0 10) (filter #(re-find (re-pattern ".png") %) files-list)))]
+    (xreate-all
+     (str folder "/ALL.mp4")
+     (map #(str folder "/" % ".png") files-list)
+     (map #(str folder "/" % ".au") files-list)
+     1920
+     1080)))
 
 (defn merge-audio-and-video [video-path audio-path output-path]
   (let [file (File. video-path)
@@ -147,36 +141,32 @@
     (if (not (.exists file))
       false
       (try
-        (let [grabber1 (new FFmpegFrameGrabber video-path)
+        (let [file1 (File. audio-path)
+              grabber1 (new FFmpegFrameGrabber video-path)
               grabber2 (new FFmpegFrameGrabber audio-path)
               recorder (FFmpegFrameRecorder. output-path
-                                             1280
-                                             720
-                                            ;;  (.getImageWidth grabber1)
-                                            ;;  (.getImageHeight grabber1)
+                                             1920
+                                             1080
                                              (.getAudioChannels grabber2))]
 
-          (.setVideoCodec recorder avcodec/AV_CODEC_ID_H264)
-          (.setFrameRate recorder 25)
-          (.setVideoBitrate recorder 100)
-          (.setPixelFormat recorder avutil/AV_PIX_FMT_YUV420P)
-          (.setFormat recorder "mp4")
+          (println (.exists file1))
+          (println (.getName file1))
 
-          (println "Audio Channels" (.getAudioChannels grabber2))
-          (println "Audio Sample Rate" (.getSampleRate grabber2))
-          (println "Audio Sample Format" (.getSampleFormat grabber2))
-          (println "Audio Frame Rate" (.getFrameRate grabber2))
-          (println "Audio Length in Frames" (.getLengthInFrames grabber2))
-          
-          
-          (println grabber2)
-          (.start grabber1)
-          (println "here1")
           (.start grabber2)
+          (.start grabber1)
+
           (.setFrameRate recorder (.getFrameRate grabber1))
           (.setSampleRate recorder (.getSampleRate grabber2))
+          (.setAudioChannels recorder (.getAudioChannels grabber2))
+          (.setFormat recorder "mp4")
+          (.setVideoCodec recorder avcodec/AV_CODEC_ID_H264)
+          (.setFrameRate recorder 25)
+          (.setVideoBitrate recorder 200)
+          (.setPixelFormat recorder avutil/AV_PIX_FMT_YUV420P)
+          (.setAudioCodec recorder avcodec/AV_CODEC_ID_AAC)
+
           (.start recorder)
-          (println "here2")
+
           (let [frame1 (.grabFrame grabber1)
                 frame2 (.grabFrame grabber2)]
             (loop [frame1 (.grabFrame grabber1)]
@@ -192,14 +182,56 @@
             (.stop recorder)
             is-created))
         (catch Exception e
-          (println e))
-        (finally
-          (try
-            (when grabber1
-              (.release grabber1))
-            (when grabber2
-              (.release grabber2))
-            (when recorder
-              (.release recorder))
-            (catch Exception e
-              (println e))))))))
+          (println e))))))
+
+(defn merge-audios-and-video [video-path audio-paths output-path]
+  (let [file (File. video-path)
+        is-created true
+        video-grabber nil
+        audio-grabbers []
+        recorder nil]
+    (if (not (.exists file))
+      false
+      (try
+        (let [video-grabber (new FFmpegFrameGrabber video-path)
+              audio-grabbers (map #(new FFmpegFrameGrabber %) audio-paths)
+              recorder (FFmpegFrameRecorder. output-path 1920 1080 (.getAudioChannels (first audio-grabbers)))]
+
+          (doseq [audio-grabber audio-grabbers]
+            (.start audio-grabber))
+          (.start video-grabber)
+          
+          (.setFrameRate recorder (.getFrameRate video-grabber))
+          (.setSampleRate recorder (.getSampleRate (first audio-grabbers)))
+          (.setAudioChannels recorder (.getAudioChannels (first audio-grabbers)))
+          (.setFormat recorder "mp4")
+          (.setVideoCodec recorder avcodec/AV_CODEC_ID_H264)
+          (.setFrameRate recorder 25)
+          (.setVideoBitrate recorder 200)
+          (.setPixelFormat recorder avutil/AV_PIX_FMT_YUV420P)
+          (.setAudioCodec recorder avcodec/AV_CODEC_ID_AAC)
+          
+          (.start recorder)
+
+
+          (let [frame1 (.grabFrame video-grabber)
+                frame2 (.grabFrame (first audio-grabbers))]
+            (println frame1)
+            (println frame2)
+            (loop [frame1 (.grabFrame video-grabber)]
+              (when frame1
+                (.record recorder frame1)
+                (recur (.grabFrame video-grabber))))
+            (doseq [audio-grabber audio-grabbers]
+              (loop [frame2 (.grabFrame audio-grabber)]
+                (when frame2
+                  (.record recorder frame2)
+                  (recur (.grabFrame audio-grabber)))))
+
+            (.stop video-grabber)
+            (doseq [audio-grabber audio-grabbers]
+              (.stop audio-grabber))
+            (.stop recorder)
+            is-created))
+        (catch Exception e
+          (println e))))))
