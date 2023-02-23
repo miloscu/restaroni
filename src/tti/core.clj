@@ -29,7 +29,7 @@
                                   :children [{:fx/type :label
                                               :wrap-text true
                                               :style {:-fx-font [32 :sans-serif]}
-                                              :text (str (generate-username) (:ups comment))}
+                                              :text (str (generate-username) "  " (:ups comment) " upvotes")}
                                              {:fx/type :label
                                               :wrap-text true
                                               :style {:-fx-font [16 :sans-serif]}

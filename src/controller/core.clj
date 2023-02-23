@@ -1,69 +1,28 @@
 (ns controller.core
-  (:require [clojure.core.reducers :as reducers]
-            [clojure.string :as string]
+  (:require [clojure.string :as string]
             [creddit.core :as creddit]
-            [hiccup.form :refer [form-to text-field]]
             [hiccup.page :refer [html5]]
             [listing-transformer.core :as listing-transformer]
             [me.raynes.fs :as fs]
             [tts.core :as tts]
             [tti.core :as tti]
             [itv.core :as itv]
-            [ring.util.anti-forgery :refer [anti-forgery-field]]
-            [clojure.string :as str]
-            [cheshire.core :as json])
+            [html.core :as html])
   (:import [com.sun.speech.freetts VoiceManager]))
 
-(defn csrf-token []
-  (anti-forgery-field))
-
 (defn home-page []
-  (html5
-   [:head [:title "Restaroni"]]
-   [:body
-    [:h1 "Restaroni"]
-    (form-to [:post "/submit"]
-             (csrf-token)
-             [:label "App" (text-field {:name "app" :value "3Nb6bpRn7uTjgA"} "App")]
-             [:br]
-             [:br]
-             [:label "Secret" (text-field {:name "secret" :value "48uwu2IIZp5t6CPxl3SzT1_6hEubww"} "Secret")]
-             [:br]
-             [:br]
-             [:label "Thread" (text-field {:name "thread"} "Thread 'http.../'")]
-             [:br]
-             [:br]
-             [:label "Count" (text-field {:name "count"} "Count")]
-             [:br]
-             [:br]
-             [:input {:type "submit" :value "Submit"}])]))
+  (html/home-page))
 
-
-(defn- filter-comments [creddit-client link-id upvotes kids]
-  (filter (fn [z] (and (= (:parent_id z) link-id)
-                       (contains? z :ups)
-                       (> (:ups z) upvotes)))
-          (flatten (map (fn [y] (map (fn [x] (select-keys x [:ups :body :parent_id :name]))
-                                     (map :data (:things (:data (:json (creddit/more-child-comments creddit-client link-id (vec y))))))))
-                        (partition 100 kids)))))
-
-;; (defn- filter-comments [creddit-client link-id upvotes kids]
-;;   (->> kids
-;;        (partition 100)
-;;        (pmap (fn [k] (creddit/more-child-comments creddit-client link-id (vec k))))
-;;        (pmap (fn [response] (get-in response [:data :things])))
-;;        (flatten)
-;;        (pmap (fn [thing] (get-in thing [:data :json])))
-;;        (pmap (fn [json] (select-keys json [:ups :body :parent_id])))
-;;        (filterv (fn [comment] (println comment) (and (= (:parent_id comment) link-id)
-;;                                    (contains? comment :ups)
-;;                                    (> (:ups comment) upvotes))))))
-
-(def rq (hash-map :params {:app "3Nb6bpRn7uTjgA"
-                           :secret "48uwu2IIZp5t6CPxl3SzT1_6hEubww"
-                           :thread "https://www.reddit.com/r/AskReddit/comments/zsl0mj/what_made_you_not_want_to_have_kids/"
-                           :count "20"
-                           :headers {"user-agent" "Restaroni/0.1.0"}}))
+(defn get-listing-page [listing dirname req ct]
+  (let [image-files (itv/find-files (str "./resources/public/" dirname) "png")]
+    (if (or (= (count image-files) (inc ct)) (= (count image-files) (inc (count (:comments listing))))) ;; +1 for title image
+      (do
+        (println "All images created.")
+        (html/listing-page listing dirname))
+      (do
+        (println "Waiting for images to be created.")
+        (Thread/sleep 1000)
+        (get-listing-page listing dirname req ct)))))
 
 (defn submit-page [request]
   (let [params (:params request)
@@ -76,11 +35,12 @@
         listing (listing-transformer/get-listing-title-ups-awards-awardcount creddit-client [link-id])
         ;; kids (:more-children listing)
         ;; more-children-comments (filter-comments creddit-client link-id 10 kids)
+        _ (println listing)
         final-map (hash-map :title (:title listing)
                             :ups (:ups listing)
                             :awards (:awards listing)
-                            :comments (sort-by :ups (concat (:comments listing))))
-        dirname (str link-id (System/currentTimeMillis))]
+                            :comments (take ct (reverse (sort-by :ups (concat (:comments listing))))))
+        dirname (str link-id "_" (System/currentTimeMillis))]
     (println "params: " (dissoc params :__anti-forgery-token))
     (println "link-id: " link-id)
 
@@ -88,8 +48,6 @@
     (if (fs/exists? (str "./resources/public/" dirname))
       (println "Directory already exists.")
       (do (fs/mkdir (str "./resources/public/" dirname))
-          ;; (fs/mkdir (str link-id "/img"))
-          ;; (fs/mkdir (str link-id "/wav"))
           (println "Directory created.")))
 
     (let [_ (System/setProperty "freetts.voices" "com.sun.speech.freetts.en.us.cmu_us_kal.KevinVoiceDirectory")
@@ -97,11 +55,7 @@
       (if (nil? voice)
         (do
           (println "Voice is null")
-          (html5
-           [:head [:title "Restaroni"]]
-           [:body
-            [:p "Voice is null"]
-            [:a {:href "/"} "Home"]]))
+          (html/voice-null-page))
 
         (do
           (.allocate voice)
@@ -110,45 +64,26 @@
           (.setVolume voice 3)
 
           (let [com (filter #(contains? % :body) (:comments final-map))]
-        ;; (map #(:body %) com)
-            (doseq [comments (partition-all 5 (map #(hash-map :name (:name %) :body (:body %)) com))]
+            ;; title screen and audio
+            (let [fname (str "./resources/public/" dirname "/_____title")]
+              (tts/speakaroni fname (:title final-map) final-map voice)
+              (tti/create-and-save-page (str fname ".png") {:name (:title final-map) :ups (:ups final-map) :awards (:awards final-map) :body (:title final-map)}))
+            ;; comments to images and audio
+            (doseq [comments (partition-all 5 (map #(hash-map :name (:name %) :body (:body %) :ups (:ups %)) com))]
               (doseq [i comments]
                 (let [fname (str "./resources/public/" dirname "/" (:name i))]
                   (tts/speakaroni fname (:body i) i voice)
                   (tti/create-and-save-page (str fname ".png") i))))
             (Thread/sleep (* 200 (count com)))
-            (html5
-             [:head [:title "Restaroni"]]
-             [:body
-              [:h1 (:title final-map)]
-              [:div
-               [:a {:href "../file.mp4"} "Link"]
-               [:span " "]
-               [:a {:id "DL" :href (str "/resources/" dirname)} "Link"]]
-              [:p (str "Upvotes: " (:ups final-map))]
-              (map #(html5 [:p (str "Awards: " (:name %) " " (:count %))]) (:awards final-map))
-              (map #(html5 [:p "------------"] [:p (str (:name %) (:ups %) "\t " (:body %))]) (:comments final-map))])))))))
+            (println listing)
+            (println (:awards final-map))
+            (get-listing-page final-map dirname request ct)))))))
 
 (defn resources-page [req]
   (let [dirname (:resource (:params req))
         files (itv/find-files (str "./resources/public/" dirname) "png")]
   ;; (itv/xreate (str fname ".mp4") (str fname ".png") (str fname ".au") 1920 1080)
-    (html5
-     [:head [:title "Restaroni"]]
-     [:body
-      [:h1 (:title req)]
-      [:a {:id "DL" :href (str "/movies/" dirname)} "Generate movies"]
-      [:p (str dirname)]
-      (map #(html5
-             [:div
-              [:img {:src (str "/" dirname "/" %) :width "384" :height "216"}]
-              [:audio {:controls true} [:source {:src (str "/" dirname "/" (string/replace % ".png" ".wav")) :type "audio/wav"}]]]) files)
-              ;; [:div
-              ;;  [:a {:download true :href (str "/resources" dirname)} "Link"]]
-              ;; [:p (str "Upvotes: " (:ups final-map))]
-              ;; (map #(html5 [:p (str "Awards: " (:name %) " " (:count %))]) (:awards final-map))
-              ;; (map #(html5 [:p "------------"] [:p (str (:name %) (:ups %) "\t " (:body %))]) (:comments final-map))
-      ])))
+    (html/resources-page req dirname files)))
 
 (defn- get-silent-movies [dirname image-files req]
   (let [video-files (itv/find-files (str "./resources/public/" dirname) "silent.mp4")
@@ -156,15 +91,7 @@
     (if condition
       (do
         (println "All movies created.")
-        (html5
-         [:head [:title "Restaroni"]]
-         [:body
-          [:h1 (:title req)]
-          [:a {:id "DL" :href (str "/nonsilent/" dirname)} "Append audio"]
-
-          (map #(html5
-                 [:div
-                  [:video {:controls true :height 216 :width 384} [:source {:src (str "/" dirname "/" (string/replace % ".png" (str "silent.mp4"))) :type "video/mp4"}]]]) image-files)]))
+        (html/silent-movies-page req dirname image-files))
       (do
         (println "Waiting for silent movies to be created.")
         (Thread/sleep 1000)
@@ -176,15 +103,7 @@
     (if condition
       (do
         (println "All movies created.")
-        (html5
-         [:head [:title "Restaroni"]]
-         [:body
-          [:h1 (:title req)]
-          [:a {:id "DL" :href (str "/concatenated/" dirname)} "Concatenate videos"]
-
-          (map #(html5
-                 [:div
-                  [:video {:controls true :height 216 :width 384} [:source {:src (str "/" dirname "/" (string/replace % "silent.mp4" (str "sound.mp4"))) :type "video/mp4"}]]]) image-files)]))
+        (html/sound-movies-page req dirname image-files))
       (do
         (println "Waiting for sounded movies to be created.")
         (Thread/sleep 1000)
@@ -195,8 +114,6 @@
         image-files (sort (itv/find-files (str "./resources/public/" dirname) ".png"))
         mapped-files (map #(hash-map :image % :audio (string/replace % ".png" ".au")) image-files)
         __ (println mapped-files)]
-    ;; (Thread/sleep (* 200 (count image-files)))
-
     (doseq [img-audio-map (partition-all 5 (map #(hash-map :image (:image %) :audio (:audio %)) mapped-files))]
       (doseq [i img-audio-map]
         (itv/xreate
@@ -207,6 +124,48 @@
          1080)))
 
     (get-silent-movies dirname image-files req)))
+
+(defn get-silent-movie [dirname req]
+  (let [video-file (itv/find-files (str "./resources/public/" dirname) "ALL.mp4")
+        condition (= (count video-file) 1)]
+    (if condition
+      (do
+        (println "Movie created.")
+        (html/silent-movie-page req dirname))
+      (do
+        (println "Waiting for silent movie to be created.")
+        (Thread/sleep 1000)
+        (get-silent-movie dirname req)))))
+
+(defn movies-page-new [req]
+  (let [dirname (:resource (:params req))]
+
+    (itv/folder-to-movies2 (str "./resources/public/" dirname))
+    (get-silent-movie dirname req)))
+
+(defn- get-finished-movie [dirname req final-name]
+  (let [video-file (itv/find-files (str "./resources/public/" dirname) "ALL.mp4")
+        condition (= (count video-file) 1)]
+    (if condition
+      (do
+        (println "Movie created.")
+        (html/finished-movie-page req dirname final-name))
+      (do
+        (println "Waiting for sounded movie to be created.")
+        (Thread/sleep 1000)
+        (get-finished-movie dirname req final-name)))))
+
+(defn finished-page-new [req]
+  (println "finished-page-new")
+  (let [dirname (:resource (:params req))
+        audio-files (sort (itv/find-files (str "./resources/public/" dirname) ".au"))
+        final-name (str "FINISHED" (System/currentTimeMillis) ".mp4")]
+    ;; (Thread/sleep (* 200 (count image-files)))
+    (itv/merge-audios-and-video 
+     (str "./resources/public/" dirname "/ALL.mp4") 
+     (map #(str "./resources/public/" dirname "/" %) audio-files) 
+     (str "./resources/public/" dirname "/" final-name))
+    (get-finished-movie dirname req final-name)))
 
 (defn nonsilent-page [req]
   (let [dirname (:resource (:params req))
@@ -231,10 +190,38 @@
     (println (vec (map #(str "./resources/public/" dirname "/" %) movie-files)))
     (itv/conc (vec (map #(str "./resources/public/" dirname "/" %) movie-files)) output)
     (Thread/sleep 1000)
-    (html5 
-      [:head [:title "Restaroni"]]
-      [:body
-        [:h1 (:title req)]
-        [:a {:id "DL" :href (str "/" dirname "/" dirname "_final.mp4")} "Download final movie"]
-        [:video {:controls true :height 216 :width 384} [:source {:src (str "/" dirname "/" dirname "_final.mp4") :type "video/mp4"}]]])))
+    (html5
+     [:head [:title "Restaroni"]]
+     [:body
+      [:h1 (:title req)]
+      [:a {:id "DL" :href (str "/" dirname "/" dirname "_final.mp4")} "Download final movie"]
+      [:video {:controls true :height 216 :width 384} [:source {:src (str "/" dirname "/" dirname "_final.mp4") :type "video/mp4"}]]])))
+
+;; VESTIGIAL CODE
 ;; t3_10vdmha1675719708880
+
+;; (defn- filter-comments [creddit-client link-id upvotes kids]
+;;   (filter (fn [z] (and (= (:parent_id z) link-id)
+;;                        (contains? z :ups)
+;;                        (> (:ups z) upvotes)))
+;;           (flatten (map (fn [y] (map (fn [x] (select-keys x [:ups :body :parent_id :name]))
+;;                                      (map :data (:things (:data (:json (creddit/more-child-comments creddit-client link-id (vec y))))))))
+;;                         (partition 100 kids)))))
+
+;; (defn- filter-comments [creddit-client link-id upvotes kids]
+;;   (->> kids
+;;        (partition 100)
+;;        (pmap (fn [k] (creddit/more-child-comments creddit-client link-id (vec k))))
+;;        (pmap (fn [response] (get-in response [:data :things])))
+;;        (flatten)
+;;        (pmap (fn [thing] (get-in thing [:data :json])))
+;;        (pmap (fn [json] (select-keys json [:ups :body :parent_id])))
+;;        (filterv (fn [comment] (println comment) (and (= (:parent_id comment) link-id)
+;;                                    (contains? comment :ups)
+;;                                    (> (:ups comment) upvotes))))))
+
+;; (def rq (hash-map :params {:app "3Nb6bpRn7uTjgA"
+;;                            :secret "48uwu2IIZp5t6CPxl3SzT1_6hEubww"
+;;                            :thread "https://www.reddit.com/r/AskReddit/comments/zsl0mj/what_made_you_not_want_to_have_kids/"
+;;                            :count "20"
+;;                            :headers {"user-agent" "Restaroni/0.1.0"}}))

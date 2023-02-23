@@ -322,11 +322,13 @@
 
 (defn listing
   [credentials names]
+  (println (str "https://www.reddit.com/by_id/" (string/join "," names) "/.json"))
   (-> (http-get credentials (str "https://www.reddit.com/by_id/" (string/join "," names) "/.json"))
       (parse-response)))
 
 (defn listing-comments
   [credentials subreddit article]
+  (println  (str "https://www.reddit.com/r/" subreddit "/comments/" article ".json"))
   (http-get credentials (str "https://www.reddit.com/r/" subreddit "/comments/" article ".json")
             ;; (->)
             ;; (parse-response)

@@ -5,9 +5,46 @@
             [ring.adapter.jetty :as jetty]
             [ring.middleware.content-type :as content-type]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
-            [creddit.core :as creddit]
-            [controller.core :as controller]
-            [listing-transformer.core :as listing-transformer]))
+            [controller.core :as controller]))
+
+(def app-routes
+  (routes
+   (GET "/favicon.ico" [] (slurp (io/resource "favicon.ico")))
+   (GET "/" [] 
+     (controller/home-page))
+   (POST "/submit" request
+     (controller/submit-page request))
+   (GET "/resources/:resource" req
+     (controller/resources-page req))
+   (GET "/movies/:resource" req
+     (controller/movies-page req))
+   (GET "/movies-new/:resource" req
+     (controller/movies-page-new req))
+   (GET "/finished-new/:resource" req
+     (controller/finished-page-new req))
+   (GET "/nonsilent/:resource" req
+     (controller/nonsilent-page req))
+   (GET "/concatenated/:resource" req
+     (controller/concatenated-page req))
+   (route/resources "/")
+   (route/not-found "Not Found")))
+
+(def app
+  (-> app-routes
+      (content-type/wrap-content-type)
+      (wrap-defaults site-defaults)))
+
+(defn start-server []
+  (jetty/run-jetty app {:port 8080}))
+
+(defn -main
+  "I don't do a whole lot...yet."
+  [& args]
+  (start-server))
+
+;; (def app
+;;   (-> app-routes
+;;       (wrap-defaults site-defaults)))
 
 ;; (def creds {:user-client "3Nb6bpRn7uTjgA",
 ;;             :user-secret "48uwu2IIZp5t6CPxl3SzT1_6hEubww"})
@@ -66,49 +103,6 @@
 ;; (creddit/api-raw creddit-client "http://www.reddit.com/api/morechildren.json?link_id=t3_zsl0mj&children=j18egqp&api_type=json")
 
 ;; (creddit/more-child-comments creddit-client "t3_zsl0mj" ["j19zu2t" "j196c5j" "j1bjbii" "j1a1laa" "j1bgidr" "j18v3m8" "j19ajv6"])
-
-(def app-routes
-  (routes
-   (GET "/favicon.ico" [] (slurp (io/resource "favicon.ico")))
-   (GET "/" [] 
-     (controller/home-page))
-   (POST "/submit" request
-     (controller/submit-page request))
-   (GET "/resources/:resource" req
-     (controller/resources-page req))
-   (GET "/movies/:resource" req
-     (controller/movies-page req))
-   (GET "/nonsilent/:resource" req
-     (controller/nonsilent-page req))
-   (GET "/concatenated/:resource" req
-     (controller/concatenated-page req))
-   (route/resources "/")
-   (route/not-found "Not Found")))
-
-(def app
-  (-> app-routes
-      (content-type/wrap-content-type)
-      (wrap-defaults site-defaults)))
-
-;; (def app
-;;   (-> app-routes
-;;       (wrap-defaults site-defaults)))
-
-(defn start-server []
-  (jetty/run-jetty app {:port 8080}))
-
-;; 
-;; 
-;; 
-(defn -main
-  "I don't do a whole lot...yet."
-  [& args]
-  (println "Hello, World!"))
-
-(defn add
-  "Add two numbers"
-  [a b]
-  (+ a b))
 
 ;; (defn get-morechildren-with-more-than-x-upvotes
 ;;   "Filter comments with more than 10 upvotes"

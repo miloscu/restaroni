@@ -16,6 +16,7 @@
   [client link]
   (let [listing (get-listing client link)
         comments (get-listing-comments client (:subreddit (first listing)) (second (string/split (first link) #"_")))]
+    (println listing)
     (merge (assoc (select-keys (first listing) [:title :ups])
                   :awards (sort-by :name (map #(select-keys % [:icon_url :count :name]) (:all_awardings (first listing)))))
            comments)))

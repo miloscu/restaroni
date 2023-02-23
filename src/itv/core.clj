@@ -62,6 +62,7 @@
       (.setFrameRate recorder 25)
       (.setVideoBitrate recorder 200)
       (.setPixelFormat recorder avutil/AV_PIX_FMT_YUV420P)
+      ;; (.setPixelFormat recorder avutil/AV_PIX_FMT_RGB32_1)
       (.setFormat recorder "mp4")
 
       (.start recorder)
@@ -91,6 +92,7 @@
       (.setFrameRate recorder 25)
       (.setVideoBitrate recorder 200)
       (.setPixelFormat recorder avutil/AV_PIX_FMT_YUV420P)
+      ;; (.setPixelFormat recorder avutil/AV_PIX_FMT_RGB32_1)
       (.setFormat recorder "mp4")
 
       (.start recorder)
@@ -125,6 +127,7 @@
   (let [files (File. folder)
         files-list (.list files)
         files-list (sort (map #(subs % 0 10) (filter #(re-find (re-pattern ".png") %) files-list)))]
+    (println (map #(str folder "/" % ".au") files-list))
     (xreate-all
      (str folder "/ALL.mp4")
      (map #(str folder "/" % ".png") files-list)
@@ -163,6 +166,7 @@
           (.setFrameRate recorder 25)
           (.setVideoBitrate recorder 200)
           (.setPixelFormat recorder avutil/AV_PIX_FMT_YUV420P)
+          ;; (.setPixelFormat recorder avutil/AV_PIX_FMT_RGB32_1)
           (.setAudioCodec recorder avcodec/AV_CODEC_ID_AAC)
 
           (.start recorder)
@@ -196,6 +200,9 @@
         (let [video-grabber (new FFmpegFrameGrabber video-path)
               audio-grabbers (map #(new FFmpegFrameGrabber %) audio-paths)
               recorder (FFmpegFrameRecorder. output-path 1920 1080 (.getAudioChannels (first audio-grabbers)))]
+          
+          (println video-path)
+          (println audio-paths)
 
           (doseq [audio-grabber audio-grabbers]
             (.start audio-grabber))
@@ -207,8 +214,10 @@
           (.setFormat recorder "mp4")
           (.setVideoCodec recorder avcodec/AV_CODEC_ID_H264)
           (.setFrameRate recorder 25)
-          (.setVideoBitrate recorder 200)
+          (.setVideoBitrate recorder 200000)
+          (.setAudioBitrate recorder 128000)
           (.setPixelFormat recorder avutil/AV_PIX_FMT_YUV420P)
+          ;; (.setPixelFormat recorder avutil/AV_PIX_FMT_RGB32_1)
           (.setAudioCodec recorder avcodec/AV_CODEC_ID_AAC)
           
           (.start recorder)
