@@ -24,10 +24,10 @@
     [:h1 "Restaroni"]
     (form-to [:post "/submit"]
              (csrf-token)
-             [:label "App" (text-field {:name "app" :value "3Nb6bpRn7uTjgA"} "App")]
+             [:label "App" (text-field {:name "app" } "App")]
              [:br]
              [:br]
-             [:label "Secret" (text-field {:name "secret" :value "48uwu2IIZp5t6CPxl3SzT1_6hEubww"} "Secret")]
+             [:label "Secret" (text-field {:name "secret" } "Secret")]
              [:br]
              [:br]
              [:label "Thread" (text-field {:name "thread"} "Thread 'http.../'")]
@@ -66,6 +66,7 @@
    [:body
     [:h1 (:title req)]
     [:a {:id "DL" :href (str "/movies/" dirname)} "Generate silent movies (OLD)"]
+    [:br]
     [:a {:id "DL" :href (str "/movies-new/" dirname)} "Generate silent movie (NEW)"]
     [:p (str dirname)]
     (map #(html5
