@@ -1,6 +1,47 @@
 # restaroni
 
-TODO:
+A tool and web app to create spoken word videos from top-level replies to a Reddit thread.
+
+# Usage
+
+Register an app on Redit
+https://www.reddit.com/prefs/apps
+
+run (start-server) in the main namespace or run the .jar you built.
+
+## STEP 1
+
+Enter your App ID, App Secret, the thread itself and the number of comments you want to get from the thread (will default to all if the count exceeds the actual comment count)
+Example: 
+- 3Nb6bpRn7uTjgA
+- 48uwu2IIZp5t6CPxl3SzT1_6hEubww
+- https://www.reddit.com/r/AskReddit/comments/135hflq/what_country_do_you_dream_of_living_in_and_why/
+- 10
+
+The controller for the POST request you make will use the Reddit API wrapper made by ThatGuyHughesy and extended by me. It will return the listing whose link you pasted and display it as the title and a list of cards representing the top-level comments. It will also create the images and audio preemptively so you can go to
+
+## STEP 2
+
+Clicking GET IMAGES AND AUDIO will fetch the images and audio created in step 1 from the resource folder and lay them out for you.
+
+
+## STEP 3
+
+Clicking GENERATE SILENT MOVIE (NEW) will use the images and lengths of the audio files to create a silent slideshow with each slide lasting as long as necessary for
+
+
+## STEP 4
+
+Clicking APPEND AUDIO will append the audio files from step 3 to the slideshow you made and take you to 
+
+
+## STEP 5
+
+Which is the finished video you are free to download.
+
+### NB! _You are free to explore the (OLD) scenario as well_
+
+# TODO:
  - Fix red tint (find pixel format which both works and works correctly (right now we use Y′UV420p which works but tints the entire video a reddish hue))
  - Style (make the jFX images a bit more similar to how actual Reddit looks)
  - Improve speech (requires interop with Balabolka (windows) or similar (linux)). This repo is a POC that this can be done in pure JVM.
@@ -9,19 +50,9 @@ TODO:
 A web app and toolkit to create spoken word videos out of top-level replies to a thread.
 
 Contains a derivative of https://github.com/ThatGuyHughesy/creddit licenced under the MIT licence. See their repo and /src/creddit for comparison.
+(added code to client.clj after line 329 and the matching calls in the defprotocol in core.clj)
 
-## Usage
-
-Register an app on Redit
-https://www.reddit.com/prefs/apps
-
-run (start-server) in the main namespace or run the .jar you built.
-
-Enter your App ID, App Secret, the thread itself and the number of comments you want to get from the thread (will default to all if the count exceeds the actual comment count)
-
-Follow the steps for OLD (semi-working (works until the last step)) and NEW (fully-working) to create your video.
-
-## License
+# License
 
 CC0
 https://creativecommons.org/publicdomain/zero/1.0/

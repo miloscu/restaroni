@@ -16,3 +16,5 @@ pom.xml.asc
 *.png
 *.aif
 !example.mp4
+.clj-kondo/
+.calva/
