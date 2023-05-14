@@ -30,6 +30,7 @@
                  [ring/ring-jetty-adapter "1.9.6"]
                  [ring/ring-json "0.5.0"]
                  [slingshot "0.12.2"]]
+  :plugins [[lein-cljfmt "0.9.2"]]
   :repl-options {:init-ns restaroni.core}
   :jvm-opts ["-Xmx6G"]
   :main ^:skip-aot restaroni.core)

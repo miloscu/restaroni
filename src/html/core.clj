@@ -1,33 +1,23 @@
 (ns html.core
-  (:require [clojure.core.reducers :as reducers]
-            [clojure.string :as string]
-            [creddit.core :as creddit]
+  (:require [clojure.string :as string]
             [hiccup.form :refer [form-to text-field]]
             [hiccup.page :refer [html5]]
-            [listing-transformer.core :as listing-transformer]
-            [me.raynes.fs :as fs]
-            [tts.core :as tts]
-            [tti.core :as tti]
-            [itv.core :as itv]
-            [ring.util.anti-forgery :refer [anti-forgery-field]]
-            [clojure.string :as str]
-            [cheshire.core :as json])
-  (:import [com.sun.speech.freetts VoiceManager]))
+            [ring.util.anti-forgery :refer [anti-forgery-field]]))
 
 (defn csrf-token []
   (anti-forgery-field))
 
-(defn home-page []
+(defn home-page "Home page" []
   (html5
    [:head [:title "Restaroni"]]
    [:body
     [:h1 "Restaroni"]
     (form-to [:post "/submit"]
              (csrf-token)
-             [:label "App" (text-field {:name "app" } "App")]
+             [:label "App" (text-field {:name "app"} "App")]
              [:br]
              [:br]
-             [:label "Secret" (text-field {:name "secret" } "Secret")]
+             [:label "Secret" (text-field {:name "secret"} "Secret")]
              [:br]
              [:br]
              [:label "Thread" (text-field {:name "thread"} "Thread 'http.../'")]
@@ -65,7 +55,6 @@
    [:head [:title "Restaroni"]]
    [:body
     [:h1 (:title req)]
-    [:a {:id "DL" :href (str "/movies/" dirname)} "Generate silent movies (OLD)"]
     [:br]
     [:a {:id "DL" :href (str "/movies-new/" dirname)} "Generate silent movie (NEW)"]
     [:p (str dirname)]
@@ -75,19 +64,6 @@
             [:audio {:controls true}
              [:source {:src (str "/" dirname "/" (string/replace % ".png" ".wav")) :type "audio/wav"}]]])
          (reverse files))]))
-
-(defn silent-movies-page [req dirname image-files]
-  (html5
-   [:head [:title "Restaroni"]]
-   [:body
-    [:h1 (:title req)]
-    [:a {:id "DL" :href (str "/nonsilent/" dirname)} "Append audio"]
-
-    (map #(html5
-           [:div
-            [:video {:controls true :height 216 :width 384}
-             [:source {:src (str "/" dirname "/" (string/replace % ".png" (str "silent.mp4"))) :type "video/mp4"}]]])
-         image-files)]))
 
 (defn silent-movie-page [req dirname]
   (html5
@@ -110,20 +86,6 @@
      [:div
       [:video {:controls true :height 216 :width 384}
        [:source {:src (str "/" dirname "/" final-name) :type "video/mp4"}]]])]))
-
-
-(defn sound-movies-page [req dirname image-files]
-  (html5
-   [:head [:title "Restaroni"]]
-   [:body
-    [:h1 (:title req)]
-    [:a {:id "DL" :href (str "/concatenated/" dirname)} "Concatenate videos (OLD)"]
-
-    (map #(html5
-           [:div
-            [:video {:controls true :height 216 :width 384}
-             [:source {:src (str "/" dirname "/" (string/replace % "silent.mp4" (str "sound.mp4"))) :type "video/mp4"}]]])
-         image-files)]))
 
 (defn voice-null-page []
   (html5

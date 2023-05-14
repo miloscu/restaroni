@@ -18,3 +18,4 @@ pom.xml.asc
 !example.mp4
 .clj-kondo/
 .calva/
+.lsp/

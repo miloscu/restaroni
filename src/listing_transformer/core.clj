@@ -21,10 +21,7 @@
                   :awards (sort-by :name (map #(select-keys % [:icon_url :count :name]) (:all_awardings (first listing)))))
            comments)))
 
-(defn get-listing-morechildren 
+(defn get-listing-morechildren
   [client]
   ;; get :icon_url from each item in (:all_awardings (first (get-listing client link)))
   nil)
-(defn get-listing-award-icon-urls
-  [client link]
-  (map #(select-keys % [:icon_url]) (:all_awardings (first (get-listing client link)))))

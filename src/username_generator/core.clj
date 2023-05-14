@@ -1,4 +1,4 @@
-(ns username-generator.core 
+(ns username-generator.core
   (:require [clojure.string :as string]))
 
 (def adjectives
