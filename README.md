@@ -4,6 +4,8 @@ A tool and web app to create spoken word videos from top-level replies to a Redd
 
 # Usage
 
+Video instruction here: https://www.youtube.com/watch?v=b1XTv1_v7aE
+
 Register an app on Redit
 https://www.reddit.com/prefs/apps
 
