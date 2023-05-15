@@ -52,9 +52,9 @@ Which is the finished video you are free to download.
 Contains a derivative of https://github.com/ThatGuyHughesy/creddit licenced under the MIT licence. See their repo and /src/creddit for comparison.
 
 Essentially, I used their code in the controller to initialize the client, and then added a listing GET from the reddit docs  https://www.reddit.com/dev/api/#GET_by_id_{names} which I use in the listing_transformer namespace.
-All further code in all other namespaces is original.
+All further source* code in all other namespaces is original. 
 
-Code comments were written using GPT3.5
+*Code comments were written using GPT3.5
 
 # License
 
