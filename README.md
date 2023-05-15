@@ -41,6 +41,7 @@ Which is the finished video you are free to download.
 
 ### NB! _You are free to explore the (OLD) scenario as well_
 
+
 # TODO:
  - Fix red tint (find pixel format which both works and works correctly (right now we use Y′UV420p which works but tints the entire video a reddish hue))
  - Style (make the jFX images a bit more similar to how actual Reddit looks)
@@ -52,6 +53,8 @@ Contains a derivative of https://github.com/ThatGuyHughesy/creddit licenced unde
 
 Essentially, I used their code in the controller to initialize the client, and then added a listing GET from the reddit docs  https://www.reddit.com/dev/api/#GET_by_id_{names} which I use in the listing_transformer namespace.
 All further code in all other namespaces is original.
+
+Code comments were written using GPT3.5
 
 # License
 
