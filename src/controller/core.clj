@@ -242,7 +242,7 @@
         (Thread/sleep 1000)
         (get-finished-movie dirname req final-name)))))
 
-(defn finished-page-new
+(defn finished-page
   "Generates the finished page for the specified directory.
    
    Args:
@@ -259,7 +259,6 @@
    
    Returns: an HTML finished page displaying the finished movie for the specified directory."
   [req]
-  (println "finished-page-new")
   (let [dirname (:resource (:params req))
         audio-files (sort (itv/find-files (str "./resources/public/" dirname) ".au"))
         final-name (str "FINISHED" (System/currentTimeMillis) ".mp4")]

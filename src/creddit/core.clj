@@ -10,12 +10,12 @@
   (more-child-comments [this linkId children]
     "Retrieves additional child comments for a given link ID and children IDs."))
 
+;; A client for accessing the Reddit API using provided credentials.
 (defrecord CredditClient [credentials]
-  "A client for accessing the Reddit API using provided credentials."
   RedditApi
-  (listing [this names] (client/listing credentials names))
-  (listing-comments [this subreddit article] (client/listing-comments credentials subreddit article))
-  (more-child-comments [this linkId children] (client/more-child-comments credentials linkId children)))
+  (listing [_this names] (client/listing credentials names))
+  (listing-comments [_this subreddit article] (client/listing-comments credentials subreddit article))
+  (more-child-comments [_this linkId children] (client/more-child-comments credentials linkId children)))
 
 (defn init
   "Initializes a CredditClient with the given credentials."

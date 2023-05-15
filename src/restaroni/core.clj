@@ -13,8 +13,8 @@
    (GET "/"  [] (controller/home-page))
    (POST "/submit"  req (controller/submit-page req))
    (GET "/resources/:resource" req (controller/resources-page req))
-   (GET "/movies-new/:resource" req (controller/movies-page-new req))
-   (GET "/finished-new/:resource" req (controller/finished-page-new req))
+   (GET "/movies/:resource" req (controller/movies-page-new req))
+   (GET "/finished/:resource" req (controller/finished-page req))
    (route/resources "/")
    (route/not-found "Not Found")))
 

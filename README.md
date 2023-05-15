@@ -47,10 +47,11 @@ Which is the finished video you are free to download.
  - Improve speech (requires interop with Balabolka (windows) or similar (linux)). This repo is a POC that this can be done in pure JVM.
  - Fiddle around with video bitrate
 
-A web app and toolkit to create spoken word videos out of top-level replies to a thread.
-
+# Acknowledgements
 Contains a derivative of https://github.com/ThatGuyHughesy/creddit licenced under the MIT licence. See their repo and /src/creddit for comparison.
-(added code to client.clj after line 329 and the matching calls in the defprotocol in core.clj)
+
+Essentially, I used their code in the controller to initialize the client, and then added a listing GET from the reddit docs  https://www.reddit.com/dev/api/#GET_by_id_{names} which I use in the listing_transformer namespace.
+All further code in all other namespaces is original.
 
 # License
 

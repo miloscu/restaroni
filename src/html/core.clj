@@ -56,7 +56,7 @@
    [:body
     [:h1 (:title req)]
     [:br]
-    [:a {:id "DL" :href (str "/movies-new/" dirname)} "Generate silent movie (NEW)"]
+    [:a {:id "DL" :href (str "/movies/" dirname)} "Generate silent movie (NEW)"]
     [:p (str dirname)]
     (map #(html5
            [:div
@@ -70,7 +70,7 @@
    [:head [:title "Restaroni"]]
    [:body
     [:h1 (:title req)]
-    [:a {:id "DL" :href (str "/finished-new/" dirname)} "Append audio"]
+    [:a {:id "DL" :href (str "/finished/" dirname)} "Append audio"]
 
     (html5
      [:div
@@ -84,7 +84,7 @@
     [:h1 (:title req)]
     (html5
      [:div
-      [:video {:controls true :height 216 :width 384}
+      [:video {:controls true :height 720 :width 1280}
        [:source {:src (str "/" dirname "/" final-name) :type "video/mp4"}]]])]))
 
 (defn voice-null-page []

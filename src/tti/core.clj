@@ -8,7 +8,7 @@
            [javafx.scene SnapshotParameters]
            [javafx.scene.image WritableImage]))
 
-(defn save-javafx-node-as-png
+(defn- save-javafx-node-as-png
   "Saves a JavaFX node as a PNG image file.
 
   Args:
